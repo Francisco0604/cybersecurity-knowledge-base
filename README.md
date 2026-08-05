@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Designed and documented by **Francisco Elroy Afonso**  
-*Aspiring Penetration Tester | Practical Ethical Hacker (PEH) | Google Cybersecurity Professional*
+*Aspiring Penetration Tester*
 
 ---
 
@@ -31,7 +31,7 @@ burp-suite-labs/
 ## Author
 
 **Francisco Elroy Afonso**  
-Aspiring Penetration Tester | Practical Ethical Hacker (PEH) | Google Cybersecurity Professional
+Aspiring Penetration Tester
 
 ---
 
