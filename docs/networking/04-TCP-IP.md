@@ -256,3 +256,288 @@ The server retransmits the `SYN-ACK` packet several times while waiting for the 
 - **TCP** is responsible for reliable communication.
 - **The TCP Three-Way Handshake** establishes a connection before data transfer.
 - **TCP** uses acknowledgements and retransmissions to ensure reliable delivery even when packets are lost.
+
+---
+
+# Lesson 4 - TCP/IP (Part 2)
+
+## Objective
+
+Understand how TCP transfers data reliably using packets, sequence numbers, acknowledgements, retransmissions, and timeouts.
+
+---
+
+## Why Doesn't TCP Send One Large File?
+
+Large files are not transmitted as a single block of data.
+
+Instead, TCP divides data into smaller units called **packets**.
+
+Sending data in packets provides several advantages:
+
+- Easier retransmission if data is lost
+- Improved reliability
+- Better network efficiency
+- Multiple devices can share the network more effectively
+- Reduced impact if a packet is corrupted or dropped
+
+---
+
+## What is a Packet?
+
+A packet is the smallest unit of data transmitted over a network.
+
+Every packet consists of two main components:
+
+1. Header
+2. Payload
+
+**Structure:**
+
+```text
++-----------------------------+
+| Header                      |
+| - Source IP                 |
+| - Destination IP            |
+| - Source Port               |
+| - Destination Port          |
+| - Sequence Number           |
+| - Control Information       |
++-----------------------------+
+| Payload (Actual Data)       |
++-----------------------------+
+```
+
+The **header** contains networking information required to deliver the packet.
+
+The **payload** contains the actual application data being transmitted.
+
+---
+
+## Why Use Packets?
+
+Imagine sending a 100-page document.
+
+Instead of placing all 100 pages inside one envelope, you split it into multiple envelopes.
+
+If one envelope is lost, only that envelope needs to be resent.
+
+The Internet follows the same principle.
+
+This improves efficiency and reliability.
+
+---
+
+## Sequence Numbers
+
+Each TCP packet contains a sequence number.
+
+Sequence numbers allow the receiver to:
+
+- Determine the correct order of packets.
+- Detect missing packets.
+- Reassemble the original data correctly.
+
+**Example:**
+
+Packet 1
+
+Packet 2
+
+Packet 3
+
+Packet 4
+
+Packet 5
+
+If packets arrive as:
+
+Packet 1
+
+Packet 2
+
+Packet 4
+
+Packet 5
+
+The receiver immediately detects that Packet 3 is missing.
+
+---
+
+## Why Are Sequence Numbers Important?
+
+Networks do not guarantee that packets arrive in order.
+
+Packets may:
+
+- Arrive late
+- Arrive out of order
+- Be duplicated
+- Be dropped
+
+Sequence numbers allow TCP to reconstruct the original data regardless of the order in which packets arrive.
+
+---
+
+## Acknowledgements (ACK)
+
+When packets are successfully received, the receiver sends an acknowledgement (ACK) back to the sender.
+
+The acknowledgement confirms which data has been received successfully.
+
+If a packet is missing, the receiver continues acknowledging the last correctly received data while waiting for the missing packet.
+
+---
+
+## Retransmission
+
+If the sender does not receive the expected acknowledgement within a certain period, it assumes that a packet may have been lost.
+
+Instead of retransmitting the entire file, TCP retransmits only the missing packet.
+
+This greatly improves efficiency.
+
+---
+
+## Timeouts
+
+TCP does not wait forever.
+
+If acknowledgements are not received after several retransmission attempts, the connection eventually times out.
+
+Timeouts prevent devices from waiting indefinitely for packets that may never arrive.
+
+---
+
+## Why is TCP Reliable?
+
+TCP provides reliable communication using:
+
+- Three-Way Handshake
+- Sequence Numbers
+- Acknowledgements
+- Retransmissions
+- Timeouts
+
+These mechanisms work together to ensure that data arrives correctly and in the proper order.
+
+---
+
+## Key Concepts
+
+- Large files are divided into packets.
+- Every packet contains a header and a payload.
+- Sequence numbers identify the order of packets.
+- Acknowledgements confirm successful delivery.
+- Lost packets are retransmitted.
+- TCP ensures reliable communication.
+
+---
+
+## Important Terms
+
+### Packet
+
+The smallest unit of data transmitted across a network.
+
+---
+
+### Header
+
+The networking information attached to each packet, such as addresses, ports, sequence numbers, and control information.
+
+---
+
+### Payload
+
+The actual application data carried inside a packet.
+
+---
+
+### Sequence Number
+
+A value used to identify the correct order of packets.
+
+---
+
+### Acknowledgement (ACK)
+
+A confirmation sent by the receiver indicating that data has been successfully received.
+
+---
+
+### Retransmission
+
+The process of resending packets that were lost or not acknowledged.
+
+---
+
+### Timeout
+
+The point at which TCP stops waiting for a missing acknowledgement after multiple unsuccessful retransmission attempts.
+
+---
+
+## Practical Observations
+
+- Files are never transmitted as one large block.
+- Packets may arrive out of order.
+- TCP uses sequence numbers to reconstruct the original data.
+- Missing packets are retransmitted instead of resending the entire file.
+- TCP eventually times out if communication cannot be established.
+
+---
+
+## Interview Questions
+
+### Why does TCP divide data into packets?
+
+TCP divides data into packets to improve reliability, efficiency, and error recovery. If a packet is lost, only the missing packet needs to be retransmitted instead of the entire file.
+
+---
+
+### What is the purpose of a TCP sequence number?
+
+Sequence numbers allow the receiver to detect missing packets, reorder packets correctly, and reconstruct the original data.
+
+---
+
+### What happens if a packet is lost?
+
+The receiver detects the missing packet through sequence numbers. If the sender does not receive the expected acknowledgement, it retransmits only the missing packet.
+
+---
+
+### Why doesn't TCP resend the entire file?
+
+Retransmitting only the missing packet is much more efficient and reduces unnecessary network traffic.
+
+---
+
+### Why are acknowledgements important?
+
+Acknowledgements confirm successful delivery of data and allow the sender to determine whether retransmission is required.
+
+---
+
+## My Understanding
+
+- TCP breaks large files into smaller packets instead of sending everything at once.
+- Every packet contains both networking information (header) and actual data (payload).
+- Sequence numbers help identify missing or out-of-order packets.
+- The receiver acknowledges successfully received data.
+- If acknowledgements are not received, TCP retransmits the missing packets.
+- TCP provides reliable communication by combining sequence numbers, acknowledgements, retransmissions, and timeouts.
+
+---
+
+## Lesson Summary
+
+- TCP transfers data using packets.
+- Each packet contains a header and a payload.
+- Sequence numbers maintain packet order.
+- ACKs confirm successful delivery.
+- Lost packets are retransmitted.
+- Timeouts prevent connections from waiting forever.
+- Together, these mechanisms make TCP a reliable transport protocol.
+
