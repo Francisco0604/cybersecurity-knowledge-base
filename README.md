@@ -58,6 +58,10 @@ cybersecurity-knowledge-base/
 │   └── ...
 │
 ├── screenshots/
+│   ├── lab01-tcp-handshake.png
+│   ├── lab01-tls-client-hello.png
+│   ├── lab01-tls-server-hello.png
+│   └── lab01-encrypted-application-data.png
 │
 └── resources/
     ├── Cheat-Sheets.md
