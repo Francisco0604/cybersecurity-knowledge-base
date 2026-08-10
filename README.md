@@ -53,15 +53,18 @@ cybersecurity-knowledge-base/
 │   ├── Lab-01-TCP-Handshake.md
 │   ├── Lab-02-DNS-Lookup.md
 │   ├── Lab-03-HTTP-Request.md
-│   ├── Lab-04-Burp-Repeater.md
-│   ├── Lab-05-Cookies.md
+│   ├── Lab-04-HTTPS-TLS.md
+│   ├── Lab-05-Burp-Repeater.md
+│   ├── Lab-06-Cookies.md
 │   └── ...
 │
 ├── screenshots/
 │   ├── lab01-tcp-handshake.png
-│   ├── lab01-tls-client-hello.png
-│   ├── lab01-tls-server-hello.png
-│   └── lab01-encrypted-application-data.png
+│   ├── lab02-dns-query.png
+│   ├── lab03-http-request.png
+│   ├── lab04-tls-client-hello.png
+│   ├── lab04-tls-server-hello.png
+│   └── lab04-tls-application-data.png
 │
 └── resources/
     ├── Cheat-Sheets.md
@@ -105,8 +108,9 @@ cybersecurity-knowledge-base/
 - [Lab-01-TCP-Handshake.md](labs/Lab-01-TCP-Handshake.md) – Wireshark capture of TCP 3-Way Handshake (SYN, SYN-ACK, ACK).
 - [Lab-02-DNS-Lookup.md](labs/Lab-02-DNS-Lookup.md) – Command-line DNS query tracing (`dig`, `nslookup`) & packet inspection.
 - [Lab-03-HTTP-Request.md](labs/Lab-03-HTTP-Request.md) – Manual raw HTTP request crafting using `netcat` & `curl`.
-- [Lab-04-Burp-Repeater.md](labs/Lab-04-Burp-Repeater.md) – Intercepting requests and parameter tampering in Burp Repeater.
-- [Lab-05-Cookies.md](labs/Lab-05-Cookies.md) – Cookie security attribute auditing and privilege escalation testing.
+- [Lab-04-HTTPS-TLS.md](labs/Lab-04-HTTPS-TLS.md) – Wireshark capture & TLS 1.3 handshake analysis (Client/Server Hello, SNI, Cipher Suites, Application Data).
+- [Lab-05-Burp-Repeater.md](labs/Lab-05-Burp-Repeater.md) – Intercepting requests and parameter tampering in Burp Repeater.
+- [Lab-06-Cookies.md](labs/Lab-06-Cookies.md) – Cookie security attribute auditing and privilege escalation testing.
 
 ---
 
