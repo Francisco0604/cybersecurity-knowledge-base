@@ -18,7 +18,7 @@ Its primary purpose is to translate a human-readable domain name into an IP addr
 
 **Example:**
 
-`google.com`  →  `142.xxx.xxx.xxx`
+`google.com` → `142.250.190.46`
 
 - **Humans** remember names.
 - **Computers** communicate using IP addresses.
@@ -43,7 +43,7 @@ DNS acts as a translator between users and computers.
 
 DNS works like the contacts application on a phone.
 
-When you tap **Mom**, your phone actually dials `+91XXXXXXXXXX`.
+When you tap a contact's name, your phone dials their phone number.
 
 - You remember the **name**.
 - The phone uses the **number**.
@@ -142,7 +142,7 @@ DNS caching may occur at multiple levels:
 A human-readable name used to identify a website (e.g., `google.com`).
 
 ### IP Address
-A numerical address used to uniquely identify a device on a network (e.g., `142.xxx.xxx.xxx`).
+A numerical address used to uniquely identify a device on a network (e.g., `142.250.190.46`).
 
 ### DNS Server
 A server responsible for resolving domain names into IP addresses. If necessary, it can query other DNS servers until it finds the correct answer.
@@ -195,7 +195,6 @@ DNS caching stores recently resolved domain names and their IP addresses, reduci
 
 ## My Understanding
 
-- **Burp Suite** works because the browser is configured to use it as a proxy.
 - **DNS** is like the Internet's phonebook—it converts domain names into IP addresses.
 - A browser cannot communicate with a web server until DNS resolution is complete.
 - **DNS** uses caching to avoid repeated lookups and improve performance.
