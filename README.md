@@ -1,18 +1,18 @@
-# Cybersecurity Knowledge Base & Hands-On Security Labs
+# Cybersecurity Knowledge Base
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Category: Cybersecurity](https://img.shields.io/badge/Category-Penetration%20Testing-blue.svg)]()
 
 Designed and documented by **Francisco Elroy Afonso**  
-*Aspiring Penetration Tester / Cybersecurity Analyst*
+*Aspiring Penetration Tester*
 
 ---
 
 ## 📌 Overview
 
-Welcome to the **Cybersecurity Knowledge Base** repository! This repository serves as a comprehensive, structured technical reference and practical laboratory manual covering **Computer Networking**, **Offensive Security Tools**, **Web Application Vulnerabilities (OWASP Top 10)**, and **Hands-on Security Labs**.
+Welcome to the **Cybersecurity Knowledge Base** repository. It is a structured technical reference covering **computer networking**, **security tools**, **web-application security**, and reusable testing methodology.
 
-It is designed to bridge theoretical network & web security concepts with practical vulnerability identification, traffic interception, and remediation methodologies.
+The `labs/` directory contains foundational exercises that support these topics. Individual PortSwigger Web Security Academy walkthroughs are intentionally maintained in the separate [portswigger-labs](https://github.com/Francisco0604/portswigger-labs) repository.
 
 ---
 
@@ -89,7 +89,7 @@ cybersecurity-knowledge-base/
 
 ### 2. Security & Reconnaissance Tools ([`docs/tools/`](docs/tools/))
 - [Wireshark.md](docs/tools/Wireshark.md) – Packet capture, display filters, and network stream analysis.
-- [Burp-Suite.md](docs/tools/Burp-Suite.md) – Traffic interception proxy, Repeater, Intruder attack modes, and CA certificates.
+- [Burp-Suite.md](docs/tools/Burp-Suite.md) – Proxy setup, request interception, Repeater, and authorization-testing notes.
 - [Nmap.md](docs/tools/Nmap.md) – Host discovery, SYN stealth scanning, service versioning, and NSE scripts.
 - [Gobuster.md](docs/tools/Gobuster.md) – Directory, subdomain, and virtual host brute-forcing.
 - [FFUF.md](docs/tools/FFUF.md) – High-speed web fuzzing, parameter discovery, and filtering.
@@ -125,7 +125,7 @@ cybersecurity-knowledge-base/
 ## 👤 Author
 
 **Francisco Elroy Afonso**  
-*Aspiring Penetration Tester / Cybersecurity Analyst*
+*Aspiring Penetration Tester*
 
 ---
 
