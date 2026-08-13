@@ -435,3 +435,50 @@ Cookie: session=xyz123
    * **Content Length Delta**: Did the byte size increase/decrease substantially?
    * **Behavioral Change**: Is data for item `2` rendered, or did server validation block the modified input?
 3. Document response discrepancies to draw conclusions regarding application logic and authorization controls.
+
+---
+
+## 17. Practical Reconnaissance & Access Control Takeaways
+
+The following concepts and methodologies reflect practical insights acquired during hands-on lab exercises (e.g., PortSwigger Web Security Academy — *Unprotected Admin Functionality*). They distinguish theoretical tool features from real-world application security testing.
+
+### 1. Reconnaissance through HTTP History
+* **Mapping Application Functionality**: Rather than relying only on manual visual exploration, monitor **HTTP History** to record every background request, API endpoint, and parameter.
+* **Finding Active Endpoints**: Focus on identifying functional backend routes (e.g., administrative endpoints, state-changing APIs) rather than static media or CSS assets.
+
+### 2. `robots.txt` as a Reconnaissance Source
+* **Hidden Path Discovery**: Search engines use `robots.txt` to identify indexing boundaries, but security analysts inspect it to uncover undisclosed endpoints (e.g., `Disallow: /administrator-panel`).
+* **Misconception vs. Reality**: `robots.txt` is an advisory directive for web crawlers, **not** an access control mechanism. `Disallow` entries provide zero access restriction or server-side authorization.
+
+### 3. Endpoint Discovery & Attack Surface Mapping
+* **Beyond Visible Links**: Visible HTML links do not represent the complete attack surface. Application logic and administrative features often exist at direct endpoints without UI links.
+* **Direct URL Access**: Security testing must verify whether endpoints can be accessed directly via URL manipulation regardless of UI state.
+
+### 4. Authentication vs. Authorization
+* **Authentication (*Who are you?*)**: Validates identity (e.g., logging in as user `wiener`).
+* **Authorization (*What are you allowed to do?*)**: Enforces role-based permissions (e.g., determining whether `wiener` has permission to execute `/administrator-panel/delete`).
+* **Core Vulnerability**: Exposing administrative pages or endpoints without verifying user role permissions is a critical server-side authorization failure.
+
+### 5. Vertical Privilege Escalation
+* **Definition**: Occurs when an authenticated user with standard privileges successfully accesses functionality, data, or operations reserved for administrative or higher-privileged roles.
+
+### 6. Testing Privileged Actions
+* **Request Anatomy Deconstruction**: Identify the exact HTTP request performing the privileged operation—examine the HTTP method (`GET`/`POST`), path, parameter keys, parameter values, and response headers.
+* **Protocol-Level Inspection**: Never evaluate security based solely on browser UI behavior; inspect and test the raw HTTP request arriving at the server.
+
+### 7. Practical Burp Workflow Summary
+
+```text
+1. Explore Application   →  Navigate target functionality via Embedded Browser
+       ↓
+2. Passive Recon        →  Inspect HTTP History & robots.txt for hidden paths
+       ↓
+3. Endpoint Discovery   →  Identify undisclosed / privileged endpoints
+       ↓
+4. Intercept & Replay   →  Capture target request in Burp Proxy / Repeater
+       ↓
+5. Request Analysis     →  Deconstruct HTTP method, path, and parameters
+       ↓
+6. Authorization Test   →  Execute request under low-privileged context
+```
+
