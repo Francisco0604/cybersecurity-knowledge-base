@@ -851,17 +851,4 @@ The application failed to enforce appropriate authorization on administrative fu
 
 **Vertical privilege escalation**
 
----
 
-## 23. Important Lessons From Lab 01
-
-1. Do not rely only on visible links when mapping an application.
-2. `robots.txt` can reveal interesting paths.
-3. `robots.txt` does not provide security.
-4. Hidden endpoints still require server-side access control.
-5. HTTP History can help identify application functionality.
-6. The actual HTTP request is more important than the visual button or page.
-7. Administrative actions should have server-side authorization checks.
-8. Authentication and authorization are different.
-9. A normal user accessing administrative functionality can represent vertical privilege escalation.
-10. When testing, identify the exact request that performs the privileged action.
