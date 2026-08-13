@@ -851,4 +851,87 @@ The application failed to enforce appropriate authorization on administrative fu
 
 **Vertical privilege escalation**
 
+---
+
+## 23. Lab 02 — What We Practiced
+
+### PortSwigger Lab
+
+**User Role Controlled by Request Parameter**
+
+### What We Discovered
+
+Upon logging in as user `wiener`, request inspection revealed a client-side cookie:
+
+```http
+Cookie: Admin=false
+```
+
+Requesting the restricted administrative endpoint (`/admin`) with `Admin=false` yielded:
+
+```http
+HTTP/2 401 Unauthorized
+```
+
+This established a clear authorization boundary.
+
+### Hypothesis & Exploitation
+
+Modifying the client-controlled cookie in Burp Intercept/Repeater from:
+
+```http
+Cookie: Admin=false
+```
+
+to:
+
+```http
+Cookie: Admin=true
+```
+
+and forwarding the request to `/admin` resulted in:
+
+```http
+HTTP/2 200 OK
+```
+
+The server trusted the client-supplied cookie value and rendered the administrative panel, enabling user deletion.
+
+### Security Issue
+
+The server relied entirely on a client-modifiable cookie (`Admin=true`) rather than enforcing role verification through trusted server-side session state.
+
+### Vulnerability Class
+
+**Broken Access Control / Client-Controlled Authorization (Cookie Role Tampering)**
+
+### Privilege Escalation Type
+
+**Vertical Privilege Escalation**
+
+---
+
+## 24. Important Lessons From Lab 02
+
+1. **Never Trust Client-Controlled Values for Authorization**: Cookies sent by the browser can be freely intercepted and modified. Authorization decisions must rely on server-side session records.
+2. **Establishing an Authorization Boundary**: Requesting a restricted endpoint (`/admin`) to receive `401 Unauthorized` provides an empirical baseline before testing privilege escalation hypotheses.
+3. **Target Protected Endpoints Directly**: Modifying parameters on non-administrative pages (e.g., `/my-account`) may yield inconclusive results. Testing against restricted endpoints produces definitive evidence of authorization bypass.
+4. **Controlled Parameter Tampering**: Modify one variable at a time (e.g., `Admin=false` → `Admin=true`) to isolate cause-and-effect in application behavior.
+5. **Refined Authorization Testing Workflow**:
+
+```text
+Identify candidate cookie / parameter (e.g., Admin=false)
+        ↓
+Establish baseline on protected endpoint (GET /admin → 401 Unauthorized)
+        ↓
+Formulate hypothesis & tamper parameter (Admin=false → Admin=true)
+        ↓
+Forward modified request via Burp Proxy / Repeater
+        ↓
+Observe response delta (200 OK + Admin Panel rendered)
+        ↓
+Confirm vertical privilege escalation & document finding
+```
+
+
 
