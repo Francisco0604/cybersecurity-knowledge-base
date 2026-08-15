@@ -46,7 +46,7 @@ cybersecurity-knowledge-base/
 │       ├── SQL-Injection.md
 │       ├── XSS.md
 │       ├── CSRF.md
-│       ├── IDOR.md
+│       ├── Access-Control.md
 │       └── SSRF.md
 │
 ├── labs/
@@ -89,7 +89,7 @@ cybersecurity-knowledge-base/
 
 ### 2. Security & Reconnaissance Tools ([`docs/tools/`](docs/tools/))
 - [Wireshark.md](docs/tools/Wireshark.md) – Packet capture, display filters, and network stream analysis.
-- [Burp-Suite.md](docs/tools/Burp-Suite.md) – Proxy setup, request interception, Repeater, and authorization-testing notes.
+- [Burp-Suite.md](docs/tools/Burp-Suite.md) – Proxy interception, Repeater, Intruder, target scope, and manual testing workflows.
 - [Nmap.md](docs/tools/Nmap.md) – Host discovery, SYN stealth scanning, service versioning, and NSE scripts.
 - [Gobuster.md](docs/tools/Gobuster.md) – Directory, subdomain, and virtual host brute-forcing.
 - [FFUF.md](docs/tools/FFUF.md) – High-speed web fuzzing, parameter discovery, and filtering.
@@ -98,7 +98,7 @@ cybersecurity-knowledge-base/
 - [SQL-Injection.md](docs/web-security/SQL-Injection.md) – In-band, Blind, and OOB SQLi exploitation & parameterized query fixes.
 - [XSS.md](docs/web-security/XSS.md) – Reflected, Stored, and DOM-based XSS attack vectors & output encoding defenses.
 - [CSRF.md](docs/web-security/CSRF.md) – Cross-Site Request Forgery mechanics, anti-CSRF tokens, and `SameSite` flags.
-- [IDOR.md](docs/web-security/IDOR.md) – Insecure Direct Object References, horizontal/vertical privilege escalation.
+- [Access-Control.md](docs/web-security/Access-Control.md) – Access control models, IDOR, vertical/horizontal privilege escalation, parameter tampering, and header/method bypasses.
 - [SSRF.md](docs/web-security/SSRF.md) – Server-Side Request Forgery targeting cloud metadata (IMDS) & internal networks.
 
 ---

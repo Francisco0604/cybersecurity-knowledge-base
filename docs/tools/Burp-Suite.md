@@ -1,937 +1,260 @@
-# Burp Suite
+# Burp Suite — Tool Reference & Practical Guide
+
+Burp Suite (developed by PortSwigger) is the industry-standard integrated platform for performing security assessments and penetration testing of web applications and APIs.
+
+---
 
 ## 1. What is Burp Suite?
 
-Burp Suite is a platform for testing web applications.
-
-The most important idea is that Burp can sit between the browser and the web server:
+Burp Suite functions primarily as an intercepting HTTP/HTTPS proxy that sits between a web browser (or API client) and the destination web application server:
 
 ```text
-Browser
+[ Browser / Client ] ────────► [ Burp Suite Proxy ] ────────► [ Target Web Server ]
+                                      │
+                                      ├── Intercept & Inspect Traffic
+                                      ├── Modify Requests / Responses On-The-Fly
+                                      ├── Replay & Tamper (Repeater)
+                                      └── Automate Fuzzing (Intruder)
+```
+
+By intercepting communication at the application layer, Burp Suite enables security testers to analyze raw HTTP/S requests, discover hidden functionality, manipulate client-side variables, test authorization boundaries, and identify vulnerabilities.
+
+---
+
+## 2. Project Setup & Environment Configuration
+
+### 2.1 Project Types
+* **Temporary Projects (Community Edition):** Stored in memory; data is discarded when Burp is closed.
+* **Disk-Based Projects (Professional Edition):** Saved to a `.burp` project file on disk, allowing sessions, history, and repeater tabs to persist across restarts.
+
+### 2.2 Proxy Listener Configuration
+Burp listens on local loopback by default:
+* **Default Interface:** `127.0.0.1:8080` (configured under **Proxy** → **Proxy settings** → **Proxy listeners**).
+* **Binding to Specific Interfaces:** Useful when proxying traffic from mobile devices, VMs, or external testing environments.
+
+### 2.3 Burp's Embedded Browser vs. External Browsers
+* **Burp's Built-in Chromium Browser:** Accessible via **Proxy** → **Open browser**. Comes pre-configured with proxy settings and trusts the Burp CA certificate out of the box.
+* **External Browsers (Firefox / Chrome):**
+  1. Configure proxy settings to route HTTP/HTTPS traffic through `127.0.0.1:8080` (or use extensions like FoxyProxy).
+  2. Install Burp's PortSwigger CA Certificate (`http://burp/cert` when proxy is active) into the browser's certificate trust store under **Authorities** to intercept HTTPS traffic without TLS certificate errors.
+
+---
+
+## 3. Proxy & Intercept
+
+The **Proxy** module is the core interception engine of Burp Suite.
+
+```text
+[ Browser ] ──> HTTP Request ──> [ Burp Proxy (Intercept ON) ]
+                                            │
+                                            ├── [Forward] ──> Sent to Server
+                                            ├── [Drop]    ──> Discarded (Never sent)
+                                            └── [Modify]  ──> Tamper headers/params, then Forward
+```
+
+### 3.1 Intercept Controls
+* **Intercept is on:** All matching traffic is paused before leaving Burp, allowing manual inspection and real-time parameter/header editing.
+* **Intercept is off:** Traffic passes freely through the proxy while still being logged in **HTTP history**.
+* **Forward (Ctrl+F / Cmd+F):** Sends the current intercepted request/response onward.
+* **Drop (Ctrl+D / Cmd+D):** Silently discards the request; the server never receives it, and the client receives a broken connection.
+
+### 3.2 Interception Rules
+Configure under **Proxy** → **Proxy settings** → **Request interception rules**:
+* Filter out noisy third-party traffic (analytics, CDNs, fonts, image extensions `.png`, `.jpg`, `.css`, `.woff2`).
+* Intercept only in-scope target URLs or specific HTTP methods.
+
+---
+
+## 4. HTTP History & Traffic Analysis
+
+The **HTTP history** tab records every request and response that passes through the Burp Proxy.
+
+```text
+#  | Host              | Method | URL              | Status | Length | MIME | Title
+1  | lab.web-sec.net   | GET    | /                | 200    | 4520   | HTML | Home
+2  | lab.web-sec.net   | GET    | /robots.txt      | 200    | 120    | text | -
+3  | lab.web-sec.net   | POST   | /login           | 302    | 0      | -    | -
+4  | lab.web-sec.net   | GET    | /my-account      | 200    | 3210   | HTML | Account
+```
+
+### 4.1 Key Operations in HTTP History
+* **Display Filter Bar:** Click the filter bar above the table to filter by:
+  * **Scope:** Show only in-scope items.
+  * **MIME Type:** Hide CSS, images, and fonts to focus on HTML, JSON, and XML.
+  * **Status Code:** Filter by `2xx`, `3xx`, `4xx`, or `5xx`.
+  * **Search Term:** Search for specific parameters, cookies, or strings across requests and responses.
+* **Sending to Other Tools:**
+  * **Send to Repeater (`Ctrl+R` / `Cmd+R`):** Send selected request to Repeater for manual manipulation.
+  * **Send to Intruder (`Ctrl+I` / `Cmd+I`):** Send selected request to Intruder for automated fuzzing.
+  * **Send to Comparer (`Ctrl+M` / `Cmd+M`):** Compare two requests or responses for diff analysis.
+
+---
+
+## 5. Target & Scope
+
+The **Target** module maintains the hierarchical structure of tested applications.
+
+### 5.1 Target Scope
+Configuring scope prevents testing non-target systems and keeps logs focused:
+1. Navigate to **Target** → **Scope settings**.
+2. Add target domains or URL prefixes (e.g., `https://target-app.com`).
+3. Enable **Use advanced scope control** for fine-grained regex matching and excluding specific subdomains or paths.
+
+### 5.2 Site Map
+The **Site map** displays discovered endpoints organized by folder and URL structure:
+* Endpoints requested by the tester appear in black text.
+* Unrequested endpoints discovered via HTML links/JavaScript appear in gray text.
+
+---
+
+## 6. Burp Repeater — Manual Request Tampering
+
+Repeater is the primary tool for manual vulnerability testing and iterative exploitation. It allows you to modify headers, methods, parameters, and bodies, resend requests arbitrarily, and inspect the resulting responses.
+
+```text
+[ HTTP History / Proxy ] ──(Ctrl+R)──► [ Burp Repeater ]
+                                              │
+                                              ├── 1. Modify Target Element
+                                              ├── 2. Click "Send" (Ctrl+Space)
+                                              └── 3. Analyze Response Delta
+```
+
+### 6.1 Core Repeater Capabilities
+
+#### 1. Changing HTTP Request Methods
+* **Shortcut:** Right-click anywhere in the request editor → **Change request method**.
+* Burp automatically converts `POST` parameters in the body to URL query parameters when switching to `GET`, and vice-versa.
+
+#### 2. Manipulating Request Headers
+* **Adding Custom Headers:** Insert headers directly in the raw request editor:
+  ```http
+  X-Original-URL: /admin
+  X-Rewrite-URL: /admin/delete
+  X-Forwarded-For: 127.0.0.1
+  ```
+* **Modifying Origin & Referer:**
+  ```http
+  Referer: https://target-app.com/admin
+  ```
+* **Switching Sessions:** Replace or modify the `Cookie` header to test privilege escalation between different user accounts.
+
+#### 3. Parameter Tampering & Payload Testing
+* Modify numeric identifiers: `GET /download-transcript/2.txt` → `1.txt`.
+* Inject JSON fields (Mass Assignment): `{"email": "user@test.com", "roleid": 2}`.
+* Test parameter type juggling: Convert string to array (`user=admin` → `user[]=admin`).
+
+### 6.2 Response Inspector Views
+* **Pretty:** Formats HTML/JSON/XML with syntax highlighting and folding.
+* **Raw:** Unformatted, exact bytes returned by the server.
+* **Hex:** Byte-level hexadecimal view for inspecting binary responses or hidden characters.
+* **Render:** Emulates browser rendering of HTML responses.
+
+---
+
+## 7. Burp Intruder — Automated Fuzzing & Attacks
+
+Intruder automates customized HTTP requests for fuzzing, brute forcing, and parameter enumeration.
+
+```text
+[ Target Request ] ──► [ Define Payload Positions (§id§) ] ──► [ Select Attack Type ] ──► [ Run Attack ]
+```
+
+### 7.1 Attack Types
+
+| Attack Type | Number of Positions | Number of Paylists | Execution Logic | Use Case |
+| :--- | :---: | :---: | :--- | :--- |
+| **Sniper** | Multiple | 1 | Places each payload into one position at a time sequentially. | Fuzzing multiple parameters for SQLi/XSS individually. |
+| **Battering Ram** | Multiple | 1 | Places the *same* payload into all positions simultaneously. | Testing identical username/password combinations. |
+| **Pitchfork** | Multiple | Multiple (1:1) | Iterates through multiple wordlists in lockstep (Index 0 with 0, 1 with 1). | Username:Password credential spraying. |
+| **Cluster Bomb** | Multiple | Multiple (Cartesian) | Tests every possible combination of all wordlists. | Brute forcing Username × Password combinations. |
+
+### 7.2 Payload Types
+* **Simple List:** Custom list of strings or loaded wordlist file.
+* **Numbers:** Sequential or step-based numeric ranges (e.g., `1` to `1000` with step `1`).
+* **Brute Forcer:** Character set permutations across specified min/max lengths.
+* **Null Payloads:** Sends empty requests repeatedly (useful for denial-of-service or race condition testing).
+
+---
+
+## 8. Auxiliary Utilities
+
+### 8.1 Burp Comparer
+Comparer provides visual diffing between two requests or responses.
+* **How to Use:** Select two items from HTTP history or Repeater → Right-click → **Send to Comparer** → Choose **Words** or **Bytes** comparison.
+* **Use Cases:** Spotting subtle differences in blind SQL injection, authorization discrepancies, or timing behaviors.
+
+### 8.2 Burp Decoder
+Decoder provides rapid encoding, decoding, and hashing:
+* **Formats Supported:** URL encode/decode, Base64, HTML entities, Hex, ASCII hex, Gzip.
+* **Hashing Algorithms:** MD5, SHA-1, SHA-256, SHA-512.
+* **Smart Decode:** Automatically attempts heuristic decoding of recognized formats.
+
+### 8.3 Burp Sequencer
+Analyzes the quality of randomness in session tokens and anti-CSRF tokens:
+* Captures large samples of tokens (e.g., 10,000+ samples).
+* Performs statistical randomness tests (FIPS 140-2 entropy tests) to determine token predictability.
+
+---
+
+## 9. Practical Burp Workflows
+
+### 9.1 Multi-Account Authorization Testing Workflow
+
+To effectively test for horizontal and vertical privilege escalation without session confusion:
+
+```text
+Step 1: Open Target in Two Separate Browser Contexts
+        - Browser 1 (Normal Window): Authenticated as Administrator
+        - Browser 2 (Incognito Window / Multi-Account Container): Authenticated as Standard User (wiener)
+        ↓
+Step 2: Capture Privileged Requests in HTTP History
+        - Perform administrative action as Administrator (e.g., user promotion, delete, config change)
+        - Locate request in HTTP history and send to Repeater (Tab 1: "Admin Baseline")
+        ↓
+Step 3: Test Unauthenticated Access
+        - Duplicate request in Repeater (Tab 2: "Unauth Test")
+        - Remove Cookie / Authorization headers
+        - Send request and observe response (Expect 401/403/302 to login)
+        ↓
+Step 4: Test Vertical Privilege Escalation
+        - Duplicate request in Repeater (Tab 3: "Standard User Test")
+        - Replace Administrator session cookie with Standard User (wiener) session cookie
+        - Send request and observe response
+        ↓
+Step 5: Test Method & Header Tampering
+        - Switch HTTP method (POST <-> GET)
+        - Inject headers: X-Original-URL: /admin, Referer: /admin
+        - Compare response status code and length against Admin Baseline
+```
+
+### 9.2 Parameter & IDOR Manipulation Workflow
+
+```text
+1. Capture object-retrieval request in Proxy:
+   GET /api/documents?docId=1001 HTTP/2
+   Cookie: session=[USER-A-SESSION]
    ↓
- Burp
+2. Send to Repeater (Ctrl+R)
    ↓
-Web Server
-```
-
-Normally:
-
-```text
-Browser ───────────────► Server
-```
-
-With Burp:
-
-```text
-Browser ──► Burp ──► Server
-             │
-             └── Inspect / modify HTTP traffic
-```
-
-Burp is particularly useful for understanding and manually testing HTTP requests and responses.
-
----
-
-## 2. Burp Proxy
-
-Proxy is the part of Burp that sits between the browser and the web server.
-
-It allows us to:
-
-* Intercept requests
-* Inspect requests
-* Modify requests
-* Forward requests
-* Drop requests
-* Record traffic
-
-### Basic flow
-
-```text
-Browser
+3. Replace object ID with target user's ID:
+   GET /api/documents?docId=1002 HTTP/2
    ↓
-HTTP Request
-   ↓
-Burp Proxy
-   ↓
-Web Server
-   ↓
-HTTP Response
-   ↓
-Browser
+4. Send request and inspect response:
+   - Status 200 OK + User B data leaked ──> IDOR Confirmed
+   - Status 403 Forbidden ──> Access control properly enforced
 ```
 
 ---
 
-## 3. Intercept
-
-Intercept allows Burp to stop a request before it reaches the server.
-
-Example:
-
-```http
-GET /login HTTP/2
-Host: example.com
-```
-
-With interception enabled:
-
-```text
-Browser
-   ↓
-Request
-   ↓
-BURP
-   ↓
-[PAUSED]
-   ↓
-Server
-```
-
-You can then inspect or modify the request before deciding what to do with it.
-
-### Intercept ON
-
-The request is paused.
-
-### Intercept OFF
-
-The request normally passes through Burp without being paused.
-
----
-
-## 4. Forward and Drop
-
-When Burp intercepts a request, you generally have options such as:
-
-### Forward
-
-Sends the request onward to the server.
-
-```text
-Intercepted request
-       ↓
-    Forward
-       ↓
-    Server
-```
-
-### Drop
-
-Discards the request instead of sending it to the server.
-
-```text
-Intercepted request
-       ↓
-      Drop
-       ↓
-      ❌
-```
-
----
-
-## 5. Burp's Browser
-
-Burp provides a built-in browser that is already configured to work with Burp Proxy.
-
-This is useful when learning because we don't initially need to manually configure another browser's proxy settings.
-
-Basic workflow:
-
-```text
-Burp
- ↓
-Open Browser
- ↓
-Visit target
- ↓
-Browser generates request
- ↓
-Burp intercepts it
-```
-
-For learning, use authorized targets and deliberately vulnerable labs such as PortSwigger Web Security Academy.
-
----
-
-## 6. HTTP History
-
-HTTP History records HTTP traffic that has passed through Burp.
-
-Unlike Intercept, it does not pause the request.
-
-### Intercept vs HTTP History
-
-| Feature | Intercept | HTTP History |
-| :--- | :---: | :---: |
-| Pauses request | ✅ | ❌ |
-| Lets you inspect traffic | ✅ | ✅ |
-| Lets you modify before forwarding | ✅ | ❌ |
-| Keeps a record of requests | Not its main purpose | ✅ |
-
-Think of HTTP History as a record of the web traffic Burp has seen.
-
----
-
-## 7. HTTP Request vs Response
-
-A web conversation has two main directions:
-
-```text
-Browser ── REQUEST ──► Server
-
-Browser ◄─ RESPONSE ── Server
-```
-
-### Request
-
-The browser/client sends the request.
-
-Example:
-
-```http
-GET /web-security HTTP/2
-Host: portswigger.net
-User-Agent: Mozilla/5.0
-```
-
-### Response
-
-The server sends the response.
-
-Example:
-
-```http
-HTTP/2 200 OK
-Content-Type: text/html
-```
-
----
-
-## 8. Important Request Components
-
-### HTTP Method
-
-Example:
-
-```http
-GET /web-security HTTP/2
-```
-
-`GET` is the HTTP method.
-
-We learned:
-
-```text
-GET  → request/retrieve data
-POST → send/submit data
-```
-
-### Path
-
-```http
-GET /web-security HTTP/2
-```
-
-The path is:
-
-```text
-/web-security
-```
-
-It identifies the resource being requested.
-
-### Host
-
-```http
-Host: portswigger.net
-```
-
-Identifies the hostname the request is intended for.
-
-### User-Agent
-
-```http
-User-Agent: Mozilla/5.0 ...
-```
-
-Identifies information about the client software making the request.
-
-For example, the request may have been generated by Chromium.
-
-### Cookie
-
-```http
-Cookie: session=ABC123
-```
-
-The browser sends stored cookies back to the server.
-
-Cookies can be used to maintain session/state information.
-
----
-
-## 9. Important Response Components
-
-### Status Code
-
-Example:
-
-```http
-HTTP/2 200 OK
-```
-
-`200 OK` means the request was successfully processed and a response was returned.
-
-Another example:
-
-```http
-HTTP/2 404 Not Found
-```
-
-`404` means the requested resource wasn't found.
-
-### Content-Type
-
-```http
-Content-Type: text/html
-```
-
-Tells the client what type of content the response contains.
-
-For example:
-
-```text
-text/html
-```
-
-means HTML.
-
-### Set-Cookie
-
-A server can tell the browser to create or update a cookie:
-
-```http
-Set-Cookie: session=ABC123
-```
-
-The browser can then send it on future requests:
-
-```http
-Cookie: session=ABC123
-```
-
-So:
-
-```text
-Server
-  ↓
-Set-Cookie
-  ↓
-Browser stores cookie
-  ↓
-Future request
-  ↓
-Cookie
-  ↓
-Server
-```
-
----
-
-## 10. Repeater
-
-Repeater allows you to manually resend a request and modify it.
-
-Typical workflow:
-
-```text
-HTTP History
-     ↓
-Interesting request
-     ↓
-Send to Repeater
-     ↓
-Modify request
-     ↓
-Send
-     ↓
-Examine response
-```
-
-This is one of the most important Burp tools for manual web testing.
-
----
-
-## 11. Why Repeater is Useful
-
-Suppose you have:
-
-```http
-GET /profile?id=1001 HTTP/2
-```
-
-You can change the request:
-
-```http
-GET /profile?id=1002 HTTP/2
-```
-
-and send it again.
-
-You can then compare the responses.
-
-The important methodology is:
-
-```text
-Identify something controllable
-        ↓
-Change ONE thing
-        ↓
-Send request
-        ↓
-Observe response
-        ↓
-Compare with original
-```
-
-Don't randomly change everything at once.
-
----
-
-## 12. Query Parameters
-
-A URL can contain query parameters:
-
-```http
-GET /search?q=burp HTTP/2
-```
-
-Breakdown:
-
-```text
-/search
-   ↓
-Path
-
-?q=burp
-   ↓
-Query string
-
-q
-↓
-Parameter name
-
-burp
-↓
-Parameter value
-```
-
-Another example:
-
-```http
-GET /web-security/all-labs?test=123 HTTP/2
-```
-
-Here:
-
-```text
-Parameter name  = test
-Parameter value = 123
-```
-
-A parameter may influence what the server returns or what action it performs.
-
-This is why parameters are interesting during web application testing.
-
----
-
-## 13. Basic Burp Testing Mindset
-
-Don't think:
-
-> "Which Burp button should I press?"
-
-Think:
-
-> **"Which part of this request controls what the application does?"**
-
-For example:
-
-```http
-GET /profile?id=1001 HTTP/2
-Host: example.com
-Cookie: session=ABC123
-```
-
-Start breaking it down:
-
-```text
-GET
- ↓
-What action?
-
-/profile
- ↓
-What resource?
-
-id=1001
- ↓
-What object/parameter?
-
-Cookie
- ↓
-What session?
-
-Response
- ↓
-What did the server actually allow?
-```
-
-Then test one controlled change at a time.
-
----
-
-## 14. Reconnaissance Using HTTP History
-
-HTTP History can be used as a map of the application's attack surface.
-
-Instead of only looking for obvious vulnerabilities, review the requests generated while exploring the application.
-
-Look for requests such as:
-
-```text
-GET /
-GET /login
-GET /my-account
-GET /admin
-GET /product/...
-GET /user/...
-```
-
-Static resources such as:
-
-```text
-.css
-.js
-.png
-.svg
-.woff
-```
-
-are usually less interesting during initial application mapping.
-
-The goal is to identify:
-
-* Application functionality
-* Interesting endpoints
-* Parameters
-* Authentication-related requests
-* Administrative functionality
-* Other potentially sensitive resources
-
-A useful workflow is:
-
-```text
-Explore application
-        ↓
-Observe HTTP History
-        ↓
-Identify interesting requests
-        ↓
-Investigate them
-```
-
----
-
-## 15. robots.txt as Reconnaissance
-
-`robots.txt` is normally used to provide instructions to search-engine crawlers.
-
-Example:
-
-```text
-User-agent: *
-Disallow: /administrator-panel
-```
-
-This can reveal paths that may not be linked from the visible application.
-
-However:
-
-> **robots.txt is not an access-control mechanism.**
-
-`Disallow` does not mean that users are prevented from accessing the path.
-
-A security tester can treat information in `robots.txt` as a possible source of application paths during reconnaissance.
-
-Example workflow:
-
-```text
-Application exploration
-        ↓
-No visible admin functionality
-        ↓
-Check robots.txt
-        ↓
-/administrator-panel discovered
-        ↓
-Investigate endpoint
-```
-
----
-
-## 16. Endpoint Discovery
-
-An application may contain functionality that is not exposed through visible links.
-
-For example:
-
-```text
-Visible application
-       ↓
-No admin link
-       ↓
-robots.txt
-       ↓
-/administrator-panel
-```
-
-Therefore:
-
-> **An endpoint being hidden does not make it secure.**
-
-Security must be enforced by the server regardless of whether the endpoint is easy to discover.
-
----
-
-## 17. Authentication vs Authorization
-
-These are different concepts.
-
-### Authentication
-
-Answers:
-
-> **Who are you?**
-
-Examples:
-
-* Username/password
-* Session
-* Authentication token
-
-### Authorization
-
-Answers:
-
-> **What are you allowed to do?**
-
-For example:
-
-```text
-Normal user → normal functionality
-Administrator → administrative functionality
-```
-
-A user can be successfully authenticated but still not be authorized to access a particular resource or perform an action.
-
----
-
-## 18. Vertical Privilege Escalation
-
-Vertical privilege escalation occurs when a lower-privileged user gains access to functionality intended for a higher-privileged user.
-
-Example:
-
-```text
-Normal User
-     ↓
-Admin functionality
-     ↓
-Delete user
-```
-
-This differs from horizontal privilege escalation:
-
-```text
-User A
-  ↓
-User B's data
-```
-
-### Lab example
-
-In the unprotected admin functionality lab:
-
-```text
-Normal user
-     ↓
-/administrator-panel
-     ↓
-Administrative functionality
-     ↓
-Delete Carlos
-```
-
-The application failed to enforce appropriate authorization.
-
----
-
-## 19. Testing Privileged Actions
-
-When an interesting administrative function is discovered, identify the actual HTTP request responsible for the action.
-
-For example:
-
-```http
-GET /administrator-panel/delete?username=carlos HTTP/2
-```
-
-Break it down:
-
-```text
-HTTP method:       GET
-
-Path:              /administrator-panel/delete
-
-Parameter name:    username
-
-Parameter value:   carlos
-```
-
-This is important because the visible button in a web page is only the interface.
-
-The actual security-relevant behavior occurs through the underlying HTTP request.
-
-A useful workflow is:
-
-```text
-Find privileged functionality
-        ↓
-Trigger the action
-        ↓
-Intercept the request
-        ↓
-Identify method / endpoint / parameters
-        ↓
-Understand what the server is being asked to do
-```
-
----
-
-## 20. Burp vs Wireshark
-
-### Wireshark
-
-Primarily used to analyze network traffic and packets.
-
-```text
-Packets
- ↓
-TCP / UDP
- ↓
-DNS / HTTP / TLS
- ↓
-Network analysis
-```
-
-### Burp Suite
-
-Focused heavily on web application traffic.
-
-```text
-HTTP Request
- ↓
-Burp
- ↓
-Inspect / Modify / Replay
- ↓
-HTTP Response
- ↓
-Web application testing
-```
-
-Therefore:
-
-> **Wireshark helps understand what is happening on the network.**
-
-> **Burp helps interact with and test the web application's HTTP communication.**
-
----
-
-## 21. Current Burp Workflow
-
-The workflow we've learned so far:
-
-```text
-                    BURP
-                     │
-           ┌─────────┴─────────┐
-           ↓                   ↓
-        Proxy              HTTP History
-           │                   │
-       Intercept               │
-           │                   │
-    Forward / Drop             │
-           │                   │
-           └─────────┬─────────┘
-                     ↓
-                  Repeater
-                     │
-              Modify request
-                     ↓
-                   Send
-                     ↓
-              Read response
-```
-
-For an actual web assessment, the workflow can expand to:
-
-```text
-Explore application
-        ↓
-Observe HTTP traffic
-        ↓
-Identify interesting endpoint
-        ↓
-Inspect request
-        ↓
-Test authorization / input handling
-        ↓
-Observe response
-        ↓
-Document finding
-```
-
----
-
-## 22. Lab 01 — What We Practiced
-
-### PortSwigger Lab
-
-**Unprotected Admin Functionality**
-
-### What we discovered
-
-The application's `robots.txt` revealed:
-
-```text
-User-agent: *
-Disallow: /administrator-panel
-```
-
-We then accessed:
-
-```text
-/administrator-panel
-```
-
-without administrator authentication.
-
-The administrative panel exposed user-management functionality.
-
-The delete action generated:
-
-```http
-GET /administrator-panel/delete?username=carlos HTTP/2
-```
-
-The request was allowed to perform the privileged action.
-
-### Security issue
-
-The application failed to enforce appropriate authorization on administrative functionality.
-
-### Vulnerability class
-
-**Broken Access Control / Unprotected Administrative Functionality**
-
-### Privilege escalation type
-
-**Vertical privilege escalation**
-
----
-
-## 23. Lab 02 — What We Practiced
-
-### PortSwigger Lab
-
-**User Role Controlled by Request Parameter**
-
-### What We Discovered
-
-Upon logging in as user `wiener`, request inspection revealed a client-side cookie:
-
-```http
-Cookie: Admin=false
-```
-
-Requesting the restricted administrative endpoint (`/admin`) with `Admin=false` yielded:
-
-```http
-HTTP/2 401 Unauthorized
-```
-
-This established a clear authorization boundary.
-
-### Hypothesis & Exploitation
-
-Modifying the client-controlled cookie in Burp Intercept/Repeater from:
-
-```http
-Cookie: Admin=false
-```
-
-to:
-
-```http
-Cookie: Admin=true
-```
-
-and forwarding the request to `/admin` resulted in:
-
-```http
-HTTP/2 200 OK
-```
-
-The server trusted the client-supplied cookie value and rendered the administrative panel, enabling user deletion.
-
-### Security Issue
-
-The server relied entirely on a client-modifiable cookie (`Admin=true`) rather than enforcing role verification through trusted server-side session state.
-
-### Vulnerability Class
-
-**Broken Access Control / Client-Controlled Authorization (Cookie Role Tampering)**
-
-### Privilege Escalation Type
-
-**Vertical Privilege Escalation**
-
----
-
-## 24. Important Lessons From Lab 02
-
-1. **Never Trust Client-Controlled Values for Authorization**: Cookies sent by the browser can be freely intercepted and modified. Authorization decisions must rely on server-side session records.
-2. **Establishing an Authorization Boundary**: Requesting a restricted endpoint (`/admin`) to receive `401 Unauthorized` provides an empirical baseline before testing privilege escalation hypotheses.
-3. **Target Protected Endpoints Directly**: Modifying parameters on non-administrative pages (e.g., `/my-account`) may yield inconclusive results. Testing against restricted endpoints produces definitive evidence of authorization bypass.
-4. **Controlled Parameter Tampering**: Modify one variable at a time (e.g., `Admin=false` → `Admin=true`) to isolate cause-and-effect in application behavior.
-5. **Refined Authorization Testing Workflow**:
-
-```text
-Identify candidate cookie / parameter (e.g., Admin=false)
-        ↓
-Establish baseline on protected endpoint (GET /admin → 401 Unauthorized)
-        ↓
-Formulate hypothesis & tamper parameter (Admin=false → Admin=true)
-        ↓
-Forward modified request via Burp Proxy / Repeater
-        ↓
-Observe response delta (200 OK + Admin Panel rendered)
-        ↓
-Confirm vertical privilege escalation & document finding
-```
-
-
-
+## 10. Summary Cheat Sheet & Shortcuts
+
+| Action | Windows / Linux Shortcut | macOS Shortcut |
+| :--- | :--- | :--- |
+| **Send to Repeater** | `Ctrl + R` | `Cmd + R` |
+| **Send to Intruder** | `Ctrl + I` | `Cmd + I` |
+| **Send Request in Repeater** | `Ctrl + Space` | `Cmd + Space` |
+| **Forward Intercepted Request** | `Ctrl + F` | `Cmd + F` |
+| **Drop Intercepted Request** | `Ctrl + D` | `Cmd + D` |
+| **Switch to Next Tab** | `Ctrl + Tab` | `Cmd + Tab` |
+| **URL-Encode Selected Text** | `Ctrl + U` | `Cmd + U` |
+| **URL-Decode Selected Text** | `Ctrl + Shift + U` | `Cmd + Shift + U` |
