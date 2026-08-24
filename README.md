@@ -56,6 +56,7 @@ cybersecurity-knowledge-base/
 │       ├── Nmap.md
 │       ├── Gobuster.md
 │       ├── FFUF.md
+│       ├── SQLMap.md
 │       ├── Hydra.md
 │       ├── John-the-Ripper-and-Hashcat.md
 │       ├── Responder.md
@@ -106,6 +107,7 @@ cybersecurity-knowledge-base/
 - [Nmap.md](docs/tools/Nmap.md) – Host discovery, SYN stealth scanning, service versioning, and NSE scripts.
 - [Gobuster.md](docs/tools/Gobuster.md) – Directory, DNS subdomain, and virtual host brute-forcing.
 - [FFUF.md](docs/tools/FFUF.md) – High-speed web fuzzing, parameter discovery, and filtering.
+- [SQLMap.md](docs/tools/SQLMap.md) – Automated SQL injection detection, DBMS fingerprinting, database enumeration, and data dumping.
 - [Hydra.md](docs/tools/Hydra.md) – Multithreaded network login brute-forcing across HTTP Basic Auth, SSH, and FTP.
 - [John-the-Ripper-and-Hashcat.md](docs/tools/John-the-Ripper-and-Hashcat.md) – Offline dictionary attacks against JWT secrets, NetNTLMv2, and Kerberos tickets.
 - [Responder.md](docs/tools/Responder.md) – LLMNR, NBT-NS, and MDNS broadcast poisoning for NetNTLMv2 credential capture.
@@ -113,8 +115,8 @@ cybersecurity-knowledge-base/
 
 ### 5. Resources & References ([`resources/`](resources/))
 - [Glossary-and-Acronyms.md](resources/Glossary-and-Acronyms.md) – A-to-Z reference of cybersecurity acronyms and technical definitions.
-- [Cheat-Sheets.md](resources/Cheat-Sheets.md) – High-yield command syntax reference for Nmap, Burp, FFUF, Hydra, Responder, and Wireshark.
-- [Useful-Commands.md](resources/Useful-Commands.md) – Categorized command-line reference for scanning, web fuzzing, hash cracking, and lab administration.
+- [Cheat-Sheets.md](resources/Cheat-Sheets.md) – High-yield command syntax reference for Nmap, Burp, FFUF, SQLMap, Hydra, Responder, and Wireshark.
+- [Useful-Commands.md](resources/Useful-Commands.md) – Categorized command-line reference for scanning, web fuzzing, SQL injection, hash cracking, and lab administration.
 - [Interview-Questions.md](resources/Interview-Questions.md) – Technical interview questions and structured answers across networking, web security, and infrastructure.
 
 ---

