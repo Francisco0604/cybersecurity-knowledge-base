@@ -43,6 +43,7 @@ cybersecurity-knowledge-base/
 │   │   ├── SQL-Injection.md
 │   │   ├── XSS.md
 │   │   ├── CSRF.md
+│   │   ├── CORS.md
 │   │   └── SSRF.md
 │   │
 │   ├── infrastructure-security/
@@ -94,6 +95,7 @@ cybersecurity-knowledge-base/
 - [SQL-Injection.md](docs/web-security/SQL-Injection.md) – In-band, Blind, and Out-of-Band SQLi exploitation & parameterized queries.
 - [XSS.md](docs/web-security/XSS.md) – Reflected, Stored, and DOM-based Cross-Site Scripting attack vectors & context-aware encoding.
 - [CSRF.md](docs/web-security/CSRF.md) – Cross-Site Request Forgery mechanics, anti-CSRF tokens, and `SameSite` flags.
+- [CORS.md](docs/web-security/CORS.md) – Same-Origin Policy (SOP), CORS misconfigurations, origin reflection, unsafe regex, null origin trust, and cross-origin data exfiltration.
 - [SSRF.md](docs/web-security/SSRF.md) – Server-Side Request Forgery targeting cloud metadata (IMDS) & internal network pivoting.
 
 ### 3. Infrastructure & Active Directory Security ([`docs/infrastructure-security/`](docs/infrastructure-security/))
