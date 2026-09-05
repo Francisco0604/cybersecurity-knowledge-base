@@ -63,6 +63,9 @@ cybersecurity-knowledge-base/
 │       ├── Responder.md
 │       └── Docker-in-Pentesting.md
 │
+├── vulnerability-scanning/
+│   └── tryhackme-vulnerability-scanning-tools.md
+│
 └── resources/
     ├── Glossary-and-Acronyms.md
     ├── Cheat-Sheets.md
@@ -115,7 +118,10 @@ cybersecurity-knowledge-base/
 - [Responder.md](docs/tools/Responder.md) – LLMNR, NBT-NS, and MDNS broadcast poisoning for NetNTLMv2 credential capture.
 - [Docker-in-Pentesting.md](docs/tools/Docker-in-Pentesting.md) – Deploying and isolating vulnerable web practice targets (OWASP Juice Shop, DVWA).
 
-### 5. Resources & References ([`resources/`](resources/))
+### 5. Vulnerability Scanning ([`vulnerability-scanning/`](vulnerability-scanning/))
+- [tryhackme-vulnerability-scanning-tools.md](vulnerability-scanning/tryhackme-vulnerability-scanning-tools.md) – Automated vulnerability scanning fundamentals, CVE/CVSS analysis, Nmap, Nmap NSE, Nikto, and OpenVAS/Greenbone.
+
+### 6. Resources & References ([`resources/`](resources/))
 - [Glossary-and-Acronyms.md](resources/Glossary-and-Acronyms.md) – A-to-Z reference of cybersecurity acronyms and technical definitions.
 - [Cheat-Sheets.md](resources/Cheat-Sheets.md) – High-yield command syntax reference for Nmap, Burp, FFUF, SQLMap, Hydra, Responder, and Wireshark.
 - [Useful-Commands.md](resources/Useful-Commands.md) – Categorized command-line reference for scanning, web fuzzing, SQL injection, hash cracking, and lab administration.
